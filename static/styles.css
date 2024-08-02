@@ -1,0 +1,52 @@
+footer p {
+    margin: 0;
+}
+body {
+    padding-top: 20px;
+    margin-bottom: 3cm;
+}
+.instructions {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+.container {
+    max-width: 800px;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-control {
+    border-radius: 0.25rem;
+}
+.btn-primary {
+    border-radius: 0.25rem;
+}
+.project-table th, .project-table td {
+    text-align: center;
+}
+.remove-btn {
+    margin-top: 5px;
+}
+.d-flex {
+    display: flex;
+    flex-wrap: wrap;
+}
+.form-check {
+    margin-right: 15px;
+    margin-bottom: 10px;
+}
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 10px 0;
+    border-top: 1px solid #dee2e6;
+    font-size: 14px;
+}

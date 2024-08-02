@@ -1,0 +1,8 @@
+ortools.sat.python
+pandas
+datetime
+tabulate
+json
+flask
+fpdf
+pytest

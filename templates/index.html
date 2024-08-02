@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable Generator</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Timetable Generator</h1>
+        <p class="instructions">
+            This application will generate a timetable, allocating timeblocks for as many projects as entered, within the specified days and constraints.
+            Projects will be 
+            allocated in the available time. If not enough time is available, the application may find a feasible solution and allocate less timeblocks for a 
+            given project.
+        </p>
+        <form action="/generate" method="post" onsubmit="return validateConstraints()">
+            <div class="form-group">
+                <label>Select Available Days:</label>
+                <div class="d-flex flex-wrap" id="available-days">
+                    <div class="form-check mr-3">
+                        <input class="form-check-input" type="checkbox" name="available_days" value="Sunday">
+                        <label class="form-check-label">Sunday</label>
+                    </div>
+                    <div class="form-check mr-3">
+                        <input class="form-check-input" type="checkbox" name="available_days" value="Monday" checked>
+                        <label class="form-check-label">Monday</label>
+                    </div>
+                    <div class="form-check mr-3">
+                        <input class="form-check-input" type="checkbox" name="available_days" value="Tuesday" checked>
+                        <label class="form-check-label">Tuesday</label>
+                    </div>
+                    <div class="form-check mr-3">
+                        <input class="form-check-input" type="checkbox" name="available_days" value="Wednesday" checked>
+                        <label class="form-check-label">Wednesday</label>
+                    </div>
+                    <div class="form-check mr-3">
+                        <input class="form-check-input" type="checkbox" name="available_days" value="Thursday" checked>
+                        <label class="form-check-label">Thursday</label>
+                    </div>
+                    <div class="form-check mr-3">
+                        <input class="form-check-input" type="checkbox" name="available_days" value="Friday" checked>
+                        <label class="form-check-label">Friday</label>
+                    </div>
+                    <div class="form-check mr-3">
+                        <input class="form-check-input" type="checkbox" name="available_days" value="Saturday">
+                        <label class="form-check-label">Saturday</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Select Available Time Range:</label>
+                <div class="d-flex">
+                    <div class="mr-3 flex-fill">
+                        <label for="start_time">Start Time:</label>
+                        <input type="time" class="form-control" id="start_time" name="start_time" value="09:00" required>
+                    </div>
+                    <div class="flex-fill">
+                        <label for="end_time">End Time:</label>
+                        <input type="time" class="form-control" id="end_time" name="end_time" value="17:00"  required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Table -->
+            <table class="table table-bordered project-table">
+                <thead>
+                    <tr>
+                        <th>Project Name</th>
+                        <th>Blocks per Week</th>
+                        <th>Hours per Block (30-minute increments)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="projects-container">
+                    <tr>
+                        <td><input type="text" class="form-control" name="projects[0][name]" required></td>
+                        <td><input type="number" class="form-control" name="projects[0][blocks_per_week]" value="3" min="1" required></td>
+                        <td><input type="number" class="form-control" name="projects[0][hours_per_block]" value="1" step="0.5" min="0.5" max="24" required></td>
+                        <td><button type="button" class="btn btn-danger remove-btn" onclick="removeProject(this)">Remove</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <input type="hidden" id="project_count" name="project_count" value="1">
+            <button type="button" class="btn btn-success" onclick="addProject()">Add Another Project</button>
+
+            <!-- Fixed Constraints -->
+            <h3 class="mt-4">Fixed Constraints</h3>
+            <p class="instructions">
+                Enter constraints for any timeblocks you don't want automatically allocated, for instance lunch breaks or fixed meetings.
+            </p>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="constraints-container">
+                    <tr>
+                        <td>
+                            <select class="form-control" name="constraints[0][day]" required>
+                                <option value="Sunday">Sunday</option>
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                            </select>
+                        </td>
+                        <td><input type="time" class="form-control" id="constraint_start" name="constraints[0][start_time]" required></td>
+                        <td><input type="time" class="form-control" id="constraint_end" name="constraints[0][end_time]" required></td>
+                        <td><input type="text" class="form-control" name="constraints[0][name]" required></td>
+                        <td><button type="button" class="btn btn-danger remove-btn" onclick="removeConstraint(this)">Remove</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <input type="hidden" id="constraint_count" name="constraint_count" value="1">
+            <button type="button" class="btn btn-success" onclick="addConstraint()">Add Another Constraint</button>
+
+            <br><br>
+            <button type="submit" class="btn btn-primary btn-block">Generate Timetable</button>
+        </form>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- My scripts -->
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script> 
+    <footer class="text-center mt-4">
+        <p>&copy; 2024 <a href="https://www.linkedin.com/in/miguelurdinola/" target="_blank">Miguel Urdinola</a> - Final Project for Harvard CS50 Introduction to Python Course</p>
+    </footer>
+</body>
+</html>
