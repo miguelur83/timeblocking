@@ -77,6 +77,7 @@ def generate():# Extract available days
     except Exception as e:
         error_message = str(e)
         return render_template('results.html', error=error_message)
-
+    
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80)
+    port = int(os.environ.get('PORT', 5000))  # Default to 5000 if PORT is not set
+    app.run(host="0.0.0.0", port=port)
