@@ -4,6 +4,7 @@ import pandas as pd
 from pdf import generate_pdf
 from project import schedule_blocks, create_timetable, get_project_statistics
 import json
+import os
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # Required for flashing messages
