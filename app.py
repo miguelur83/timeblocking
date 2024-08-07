@@ -5,6 +5,7 @@ from pdf import generate_pdf
 from project import schedule_blocks, create_timetable, get_project_statistics
 import json
 import os
+import logging
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # Required for flashing messages
@@ -80,5 +81,6 @@ def generate():# Extract available days
         return render_template('results.html', error=error_message)
     
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
     port = int(os.environ.get('PORT', 5000))  # Default to 5000 if PORT is not set
     app.run(host="0.0.0.0", port=port)
