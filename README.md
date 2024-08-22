@@ -1,6 +1,6 @@
 # TIMETABLE GENERATOR
 #### Video Demo: [Youtube link](https://youtu.be/HLyhFN-lRLQ)
-#### Live Demo: [Here](https://timeblocking-production.up.railway.app/)
+#### Live Demo: [Here](https://timeblocking.vercel.app/)
 ## Description:
 This application uses Google's OR-Tools to optimize the allocation of timeblocks for specified projects to the available time, resulting in a timetable. It was inspired by my need to allocate my weekly time to several different initiatives. The order in which they appeared each day didn't really matter, and in fact them being "randomized" made each day more interesting (to me) than following the same established routine each day. After some research, I found the OR-Tools tutorial referenced below, and thought it would be a nice chance to learn how to use this tool for general scheduling problems. It was harder than I anticipated.
 
