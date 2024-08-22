@@ -95,7 +95,7 @@ def generate_pdf(timetable, filename, start_time, end_time, project_names):
 
     # Save PDF to a buffer
     pdf_buffer = BytesIO()
-    pdf.output(pdf_buffer)
+    pdf.output(pdf_buffer, dest='S') 
     pdf_buffer.seek(0)
 
     return pdf_buffer
