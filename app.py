@@ -10,6 +10,8 @@ import uuid
 
 app = Flask(__name__)
 
+app.secret_key = os.urandom(24)  # Generates a random 24-byte key
+
 # Route to serve the index.html page
 @app.route('/')
 def index():
