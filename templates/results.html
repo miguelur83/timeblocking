@@ -61,8 +61,8 @@
                 You can view or download the generated timetable PDF using the links below:
             </p>
             
-            <a href="{{ url_for('tmp', filename=filename) }}" target="_blank" class="btn btn-info">View PDF</a>
-            <a href="{{ url_for('tmp', filename=filename) }}" class="btn btn-primary" download>Download PDF</a>
+            <a href="{{ url_for('download_pdf', pdf_id=pdf_id) }}" target="_blank" class="btn btn-info">View PDF</a>
+            <a href="{{ url_for('download_pdf', pdf_id=pdf_id) }}" class="btn btn-primary" download>Download PDF</a>
             
             <br><br>
         {% endif %}

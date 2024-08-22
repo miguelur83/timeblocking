@@ -1,10 +1,12 @@
-from flask import Flask, request, render_template, redirect, flash
+from io import BytesIO
+from flask import Flask, request, render_template, session, send_file, abort
 from ortools.sat.python import cp_model
 import pandas as pd
 from pdf import generate_pdf
 from project import schedule_blocks, create_timetable, get_project_statistics
 import json
 import os
+import uuid
 
 app = Flask(__name__)
 
@@ -64,12 +66,18 @@ def generate():# Extract available days
         # Handle scheduling result and generate PDF
         if status in [cp_model.FEASIBLE, cp_model.OPTIMAL]:
             print("Optimal or feasible solution found.")
+
             timetable_pdf_path = 'timetable.pdf'
-            generate_pdf(timetable, timetable_pdf_path, start_time, end_time, [project['name'] for project in projects] + [constraint['name'] for constraint in fixed_constraints])
+            pdf_buffer = generate_pdf(timetable, timetable_pdf_path, start_time, end_time, [project['name'] for project in projects] + [constraint['name'] for constraint in fixed_constraints])
+            # Create a unique identifier for the PDF
+            pdf_id = str(uuid.uuid4())
+
+            # Store the PDF buffer in the session or temporary storage
+            session[pdf_id] = pdf_buffer.getvalue()
 
             stats = get_project_statistics(projects, result)
 
-            return render_template('results.html', filename=timetable_pdf_path, stats=stats)
+            return render_template('results.html', filename=timetable_pdf_path, stats=stats, pdf_id=pdf_id)
         else:
             error_message = "No feasible solution found with the given constraints."
             return render_template('results.html', error=error_message)
@@ -77,7 +85,23 @@ def generate():# Extract available days
     except Exception as e:
         error_message = str(e)
         return render_template('results.html', error=error_message)
-    
+
+@app.route('/download_pdf/<pdf_id>')
+def download_pdf(pdf_id):
+    # Retrieve the PDF from the session or temporary storage
+    pdf_data = session.get(pdf_id)
+
+    if pdf_data is None:
+        abort(404, description="PDF not found")
+
+    # Serve the PDF file
+    return send_file(
+        BytesIO(pdf_data),
+        as_attachment=True,
+        attachment_filename='timetable.pdf',
+        mimetype='application/pdf'
+    )
+
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 8080))
     app.run(host="0.0.0.0", port=port)

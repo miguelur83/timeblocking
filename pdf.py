@@ -1,3 +1,4 @@
+from io import BytesIO
 from fpdf import FPDF
 import pandas as pd
 import os
@@ -90,4 +91,11 @@ def generate_pdf(timetable, filename, start_time, end_time, project_names):
     for _, row in timetable_with_times.iterrows():
         pdf.table_row(row, column_widths, project_colors)
 
-    pdf.output(os.path.join('tmp', filename))
+    # pdf.output(os.path.join('tmp', filename))
+
+    # Save PDF to a buffer
+    pdf_buffer = BytesIO()
+    pdf.output(pdf_buffer)
+    pdf_buffer.seek(0)
+
+    return pdf_buffer
