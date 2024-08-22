@@ -90,4 +90,4 @@ def generate_pdf(timetable, filename, start_time, end_time, project_names):
     for _, row in timetable_with_times.iterrows():
         pdf.table_row(row, column_widths, project_colors)
 
-    pdf.output(os.path.join('static', filename))
+    pdf.output(os.path.join('tmp', filename))
