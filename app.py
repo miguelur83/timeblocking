@@ -1,5 +1,5 @@
 from io import BytesIO
-from flask import Flask, request, render_template, session, send_file, abort
+from flask import Flask, logging, request, render_template, session, send_file, abort
 from ortools.sat.python import cp_model
 import pandas as pd
 from pdf import generate_pdf
@@ -71,9 +71,9 @@ def generate():# Extract available days
 
             timetable_pdf_path = 'timetable.pdf'
             pdf_buffer = generate_pdf(timetable, timetable_pdf_path, start_time, end_time, [project['name'] for project in projects] + [constraint['name'] for constraint in fixed_constraints])
-            # Create a unique identifier for the PDF
+           
+           # Create a unique identifier for the PDF
             pdf_id = str(uuid.uuid4())
-
             # Store the PDF buffer in the session or temporary storage
             session[pdf_id] = pdf_buffer.getvalue()
 
@@ -90,19 +90,23 @@ def generate():# Extract available days
 
 @app.route('/download_pdf/<pdf_id>')
 def download_pdf(pdf_id):
-    # Retrieve the PDF from the session or temporary storage
-    pdf_data = session.get(pdf_id)
+    print(f"Attempting to download PDF with ID: {pdf_id}")
+    
+    try:
+        pdf_data = session.get(pdf_id)
+        if pdf_data is None:
+            abort(404, description="PDF not found")
+        
+        pdf_bytes = BytesIO(pdf_data.encode('latin1')) 
 
-    if pdf_data is None:
-        abort(404, description="PDF not found")
-
-    # Serve the PDF file
-    return send_file(
-        BytesIO(pdf_data),
-        as_attachment=True,
-        attachment_filename='timetable.pdf',
-        mimetype='application/pdf'
-    )
+        return send_file(
+            pdf_bytes,
+            as_attachment=request.args.get('mode') == 'download',
+            download_name='timetable.pdf',
+            mimetype='application/pdf'
+        )
+    except Exception as e:
+        return "Error serving PDF", 500
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 8080))

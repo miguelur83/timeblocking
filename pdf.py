@@ -1,4 +1,4 @@
-from io import BytesIO
+from io import BytesIO, StringIO
 from fpdf import FPDF
 import pandas as pd
 import os
@@ -94,8 +94,8 @@ def generate_pdf(timetable, filename, start_time, end_time, project_names):
     # pdf.output(os.path.join('tmp', filename))
 
     # Save PDF to a buffer
-    pdf_buffer = BytesIO()
-    pdf.output(pdf_buffer, dest='S') 
+    byte_string = pdf.output(dest="S")
+    pdf_buffer = StringIO(byte_string)
     pdf_buffer.seek(0)
 
     return pdf_buffer
